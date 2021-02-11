@@ -14,6 +14,7 @@ short fadeRatio = 51;
 short maxFadeValue = 204; 
 short minFadeValue = 51;
 short currentFade = minFadeValue;
+bool sleep = false;
 
 //Setup for InfraRed Remote
 IRrecv irrecv(3);
@@ -42,7 +43,7 @@ void loop() {
         break;
        case toggleMode:
         controllerToggleMode();
-        if ( currentMode == edit) {
+        if (currentMode == edit) {
           colorSelection = CRGB::GhostWhite;
         }
         break;
@@ -50,6 +51,11 @@ void loop() {
         setColor();
         colorSelection = CRGB::GhostWhite;
         break;
+       case sleepMode:
+        sleep = !sleep;
+        if(sleep) {
+          turnOffImage();
+        }
        default:
        pickColor(irrecv.results.value);
        break;
@@ -60,23 +66,31 @@ void loop() {
   
   renderImage(colorSelection);
   FastLED.show();
-  delay(100);
+  delay(285);
 }
 
 void renderImage(CRGB color) {
-  for(int idx = 0; idx < NUM_LEDS; idx++) {
-    if (idx == selection - 1 && currentMode == edit) {
-      leds[idx] = color == black ? CRGB::GhostWhite : color;
-      leds[idx].fadeLightBy(currentFade);
-    } else {
-      leds[idx] = image[idx];
+  if(!sleep) {
+    for(int idx = 0; idx < NUM_LEDS; idx++) {
+      if (idx == selection - 1 && currentMode == edit) {
+        leds[idx] = color == black ? CRGB::GhostWhite : color;
+        leds[idx].fadeLightBy(currentFade);
+      } else {
+        leds[idx] = image[idx];
+      }
+    }
+  
+    currentFade += fadeRatio;
+   
+    if(currentFade <= minFadeValue || currentFade >= maxFadeValue){
+      fadeRatio = -fadeRatio;
     }
   }
+}
 
-  currentFade += fadeRatio;
- 
-  if(currentFade <= minFadeValue || currentFade >= maxFadeValue){
-    fadeRatio = -fadeRatio;
+void turnOffImage(){
+  for(int idx = 0; idx < NUM_LEDS; idx++) {
+    leds[idx] = black;
   }
 }
 

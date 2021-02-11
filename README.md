@@ -11,5 +11,6 @@ Because of this pattern I had to code around the matrix in the ControllerSetup.h
 * Move edit cursor around up / down / left / right
 * Choose 9 differnet colors (1-9), 0 being Black for off
 * Press some button as a select to solidify you choice of color
+* Press some button to `sleep` the picture and turn off the LEDs ( while preserving your picture )
 
 Let me know if you see a better way to g

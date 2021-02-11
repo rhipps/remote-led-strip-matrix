@@ -1,6 +1,8 @@
 //set up
 short selection = 1;
 const short matrixSize = 16;
+const int rowWrapAround = -(matrixSize-1);
+const int ledBeforeBottomRow = matrixSize*(matrixSize-1);
 
 enum mode { view, edit };
 mode currentMode = view;
@@ -25,13 +27,14 @@ const uint32_t num8 = 16730805;
 const uint32_t num9 = 16732845;
 
 //misc buttons
-const uint32_t toggleMode = 16753245;
+const uint32_t toggleMode = 16769565;
 const uint32_t okayButton = 16712445;
+const uint32_t sleepMode = 16753245;
 
 //These are the ox plow type layout controls
 bool isSelectionInEvenRowInMatrix(){
-  int row = (selection-1) / matrixSize;
-  return row == 0 ? false : row % 2 != 0;
+  int row = ((selection-1) / matrixSize) + 1;
+  return row % 2 == 0;
 }
 
 bool isEndCap(){
@@ -51,26 +54,24 @@ void oxControllerMoveUp(){
 }
 
 void oxControllerMoveDown(){
-  if(selection < matrixSize*(matrixSize-1)) {
+  if(selection < ledBeforeBottomRow) {
     selection += 2*matrixSize - 2*((selection-1)%matrixSize) - 1;
   }
 }
 
 void oxControllerMoveLeft(){
   if (!isSelectionInEvenRowInMatrix()){
-    selection -= isStartCap() ? -(matrixSize-1) : 1;
+    selection -= isStartCap() ? rowWrapAround : 1;
   } else {
-    selection += isEndCap() ? -(matrixSize-1) : 1;
+    selection += isEndCap() ? rowWrapAround : 1;
   }
 }
 
 void oxControllerMoveRight(){
-  if(selection < matrixSize*matrixSize) {
-    if (!isSelectionInEvenRowInMatrix()){
-      selection += isEndCap() ? -(matrixSize-1) : 1;
-    } else {
-      selection -= isStartCap() ? -(matrixSize-1) : 1;
-    }
+  if (!isSelectionInEvenRowInMatrix()){
+    selection += isEndCap() ? rowWrapAround : 1;
+  } else {
+    selection -= isStartCap() ? rowWrapAround : 1;
   }
 }
 
